@@ -31,6 +31,8 @@ import android.content.pm.ResolveInfo;
 import android.speech.tts.Voice;
 import android.util.Log;
 
+import android.media.AudioManager;
+
 /*
     Cordova Text-to-Speech Plugin
     https://github.com/vilic/cordova-plugin-tts
@@ -101,10 +103,18 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         }
         return true;
     }
+     private AudioManager.OnAudioFocusChangeListener listener = new AudioManager.OnAudioFocusChangeListener() {
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+            //nothing to do here
+        }
+    };
 
     @Override
     public void onInit(int status) {
         System.out.println("TTS: tts STARTED");
+         AudioManager audiMgr = (AudioManager) this.cordova.getActivity().getSystemService(Context.AUDIO_SERVICE);
+           audiMgr.requestAudioFocus(listener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
         if (status != TextToSpeech.SUCCESS) {
             tts = null;
             System.out.println("TTS: NO SUCCESS");
@@ -229,6 +239,13 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         if (!ttsInitialized) {
             callbackContext.error(ERR_NOT_INITIALIZED);
             return;
+        }
+
+          if (!params.isNull("AUDIOFOCUS")) {
+
+            /*  Log.v("TTS ", " JG TTS " + text );
+           AudioManager audiMgr = (AudioManager) this.cordova.getActivity().getSystemService(Context.AUDIO_SERVICE);
+           audiMgr.requestAudioFocus(listener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK); */
         }
 
         HashMap<String, String> ttsParams = new HashMap<String, String>();
