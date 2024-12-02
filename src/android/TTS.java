@@ -32,6 +32,7 @@ import android.speech.tts.Voice;
 import android.util.Log;
 
 import android.media.AudioManager;
+import android.telephony.TelephonyManager;
 
 /*
     Cordova Text-to-Speech Plugin
@@ -172,11 +173,27 @@ public class TTS extends CordovaPlugin implements OnInitListener {
         final PluginResult result = new PluginResult(PluginResult.Status.OK, languages);
         callbackContext.sendPluginResult(result);
     }
+private boolean isCallActive() {
+    TelephonyManager telephonyManager =
+        (TelephonyManager) cordova.getActivity().getSystemService(Context.TELEPHONY_SERVICE);
 
+    if (telephonyManager != null) {
+        int callState = telephonyManager.getCallState();
+        return callState == TelephonyManager.CALL_STATE_OFFHOOK ||
+               callState == TelephonyManager.CALL_STATE_RINGING;
+    }
+
+    return false; // Jeśli nie można sprawdzić, zakładamy, że nie ma aktywnego połączenia
+}
     private void speak(JSONArray args, CallbackContext callbackContext)
             throws JSONException, NullPointerException {
         JSONObject params = args.getJSONObject(0);
-
+         if (isCallActive()) {
+        callbackContext.error("Cannot use TTS while a call is active");
+          System.out.println("TTS: NO is caall");
+        return;
+    }
+  System.out.println("TTS: nie ma polaczenia ");
         if (params == null) {
             callbackContext.error(ERR_INVALID_OPTIONS);
             return;
