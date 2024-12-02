@@ -188,11 +188,15 @@ private boolean isCallActive() {
     private void speak(JSONArray args, CallbackContext callbackContext)
             throws JSONException, NullPointerException {
         JSONObject params = args.getJSONObject(0);
+        try {
          if (isCallActive()) {
         callbackContext.error("Cannot use TTS while a call is active");
           System.out.println("TTS: NO is caall");
         return;
     }
+     } catch (SecurityException e) {
+            System.out.println("TTS: Missing permission for READ_PHONE_STATE");
+        }
   System.out.println("TTS: nie ma polaczenia ");
         if (params == null) {
             callbackContext.error(ERR_INVALID_OPTIONS);
