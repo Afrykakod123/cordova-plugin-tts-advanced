@@ -192,6 +192,7 @@ private boolean isCallActive() {
          if (isCallActive()) {
         callbackContext.error("Cannot use TTS while a call is active");
           System.out.println("TTS: NO is caall");
+              tts.stop();
         return;
     }
      } catch (SecurityException e) {
